@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>שאלון אינטראקטיבי - CapsimCore (חלק 1)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: "Segoe UI", Arial, sans-serif; direction: rtl; background: #f5f5fa; color: #222; margin: 0; padding: 0; }
+    #quiz-container { max-width: 560px; margin: 32px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px #0001; padding: 32px 24px 24px 24px; }
+    h1 { font-size: 2em; margin-bottom: 12px; }
+    b { color: #1b5e20; }
+    button { background: #2962ff; color: #fff; border: none; border-radius: 7px; padding: 8px 18px; font-size: 1em; cursor: pointer; margin-right: 8px;}
+    button[disabled] { background: #cfd8dc; color: #888; cursor: not-allowed;}
+    .answers label { display: block; margin-bottom: 10px; cursor: pointer;}
+    #feedback { margin-top: 12px; font-weight: bold; min-height: 24px;}
+    #score { margin: 16px 0 0 0; font-size: 1.1em; color: #1565c0;}
+    .done { color: #388e3c; font-size: 1.3em; margin-bottom: 32px;}
+    @media (max-width: 600px) {
+      #quiz-container { padding: 10px 2vw; }
+    }
+  </style>
+</head>
+<body>
+  <div id="quiz-container"></div>
+  <script>
+const questions = [
+  {
+    q: "מה הקריטריון הכי חשוב ב-High Tech?",
+    answers: [
+      "א. מחיר",
+      "ב. גודל ומיקום (מיקום)",
+      "ג. MTBF",
+      "ד. גיל המוצר"
+    ],
+    correct: 1
+  },
+  {
+    q: "במוצר נמוך טכנולוגיה, איזה קריטריון הוא מוצר נמוך?",
+    answers: [
+      "א. גודל ומיקום",
+      "ב. גיל המוצר",
+      "ג. MTBF",
+      "ד. מהירות הייצור"
+    ],
+    correct: 1
+  },
+  {
+    q: "מהי השפעה של דירוג אוטומציה 10.0?",
+    answers: [
+      "א. עלות ייצור נמוך מאוד",
+      "ב. פגיעה קשה באיכות",
+      "ג. גמישות גבוהה בעיצוב מחדש",
+      "ד. הוצאה כספית גבוהה על פרסום"
+    ],
+    correct: 0
+  },
+  {
+    q: "מה יקרה למוצר שמתי ישן בשוק ה-High Tech?",
+    answers: [
+      "א. יעלה בביקוש",
+      "ב. יאבד אטרקטיביות במהירות",
+      "ג. יתאים יותר לשוק ה-Low Tech",
+      "ד. יתייקר בפועל"
+    ],
+    correct: 1
+  },
+  {
+    q: "מה מסמל MTBF?",
+    answers: [
+      "א. עלות ייצור ממוצעת",
+      "ב. הזמן הממוצע בין תקלות",
+      "ג. חיי דף של מוצר",
+      "ד. גיל שוק"
+    ],
+    correct: 1
+  },
+  {
+    q: "איך להגדיל את שולי התרומה?",
+    answers: [
+      "א. הגדלת פרסום בלבד",
+      "ב. הקטנת עלויות ייצור",
+      "ג. הוספת מוצרים חדשים",
+      "ד. העלאת אוטומציה ללא שינוי אחר"
+    ],
+    correct: 1
+  },
+  {
+    q: "מה ההשפעה של השקעה גבוהה במו\"פ (R&D) על מוצר הייטק?",
+    answers: [
+      "א. מגדילה ביקוש",
+      "ב. מצמצמת אמינות",
+      "ג. מעלה MTBF",
+      "ד. מקטינה פרסום פרסום"
+    ],
+    correct: 0
+  },
+  {
+    q: "מהו יתרון של אוטומציה גבוהה?",
+    answers: [
+      "א. עלות עבודה נמוכה",
+      "ב. גמישות גבוהה לשינויים",
+      "ג. קיצור זמן פיתוח",
+      "ד. עלייה בשכר עובדים"
+    ],
+    correct: 0
+  },
+  {
+    q: "מהו חיסרון של אוטומציה גבוהה?",
+    answers: [
+      "א. עלות ייצור גבוה",
+      "ב. קושי לשנות עיצוב המוצר",
+      "ג. פרסום פחות אפקטיבי",
+      "ד. ירידה ב-MTBF"
+    ],
+    correct: 1
+  },
+  {
+    q: "מה מתאר את פילוח המשחק במשחק?",
+    answers: [
+      "א. שוק יחיד עם דרישות אחידות",
+      "ב. היי טק ו-Low Tech",
+      "ג. שלושה שווקים לפי מחיר",
+      "ד. פילוח לפי איכות בלבד"
+    ],
+    correct: 1
+  },
+  {
+    q: "איזה דוח מסכם את מצב הנכס והרווחים של החברה?",
+    answers: [
+      "א. מאזן",
+      "ב. הצהרת הכנסה",
+      "ג. תזרים מזומנים",
+      "ד. דוח מו\"פ"
+    ],
+    correct: 1
+  },
+  {
+    q: "מהו יתרון בהשקעה גבוהה במכירות (תקציב מכירות)?",
+    answers: [
+      "א. זמינות גבוהה יותר לחנויות",
+      "ב. עלייה ב-MTBF",
+      "ג. החתת פרסום",
+      "ד. הורדת אוטומציה"
+    ],
+    correct: 0
+  },
+  {
+    q: "איזה פרמטר מצביע על שביעות רצון משקיעים?",
+    answers: [
+      "א. מחיר ליחידה",
+      "ב. מחיר מלאי",
+      "ג. רמת אוטומציה",
+      "ד. מרווח תרומה"
+    ],
+    correct: 1
+  },
+  {
+    q: "באיזה פלח מחיר שכר High Tech מוכנים לשלם יותר?",
+    answers: [
+      "א. 15–20 דולר",
+      "ב. 5–10 דולר",
+      "ג. 1–5 דולר",
+      "ד. מתחת ל-5 דולר"
+    ],
+    correct: 0
+  },
+  {
+    q: "לקוחות Low Tech יעדיפו קוד עם:",
+    answers: [
+      "א. חדשנות גבוהה",
+      "ב. אמינות בינונית (MTBF)",
+      "ג. מחיר גבוה",
+      "ד. שיווק כבד"
+    ],
+    correct: 1
+  },
+  {
+    q: "מהי ההשפעה של חוב (חוב) על החברה?",
+    answers: [
+      "א. מקטין סיכונים",
+      "ב. מגביר תשואה על ההון",
+      "ג. לא משפיע",
+      "ד. מעלה את מחיר המוצר"
+    ],
+    correct: 1
+  },
+  {
+    q: "מהי השפעה של קיבולת במפעל?",
+    answers: [
+      "א. כמות מקסימלית אפשרית",
+      "ב. מחיר יחידה",
+      "ג. אחוז שביעות רצון עובדים",
+      "ד. כולל רווחיות"
+    ],
+    correct: 0
+  },
+  {
+    q: "אם חברה לא משקיעה בפרסום (קידום), מה יקרה?",
+    answers: [
+      "א. ירידה במו��עות המותג",
+      "ב. עלייה במחיר",
+      "ג. ירידה ב-MTBF",
+      "ד. גידול ב-Capacity"
+    ],
+    correct: 0
+  },
+  {
+    q: "מה מייצג הצהרת תזרים מזומנים?",
+    answers: [
+      "א. רווח נקי",
+      "ב. תנועת מזומנים פנימה והחוצה",
+      "ג. חוב נטו",
+      "ד. מחיר מניה"
+    ],
+    correct: 1
+  },
+  {
+    q: "כיצד משפיעה גודל ההזמנה (מלאי) על?",
+    answers: [
+      "א. מלאי עודף מעלה עלויות אחסון",
+      "ב. מלאי עודף מעלה נדל,",
+      "ג. מלאי נמוך משפר אמינות",
+      "ד. מלאי נמוך מעלה אוטומציה"
+    ],
+    correct: 0
+  },
+  {
+    q: "מהו אפקט של הורדת מחיר ב-High Tech?",
+    answers: [
+      "א. מגביר ביקוש מתון",
+      "ב. מגדיל MTBF",
+      "ג. מקטין אוטומציה",
+      "ד. לא משפיע כלל"
+    ],
+    correct: 0
+  },
+  {
+    q: "למה חשוב להתאים את מיקום המוצר על מפת תפיסת ציוד (מפה תפיסתית)?",
+    answers: [
+      "א. כדי בדרישות השוק",
+      "ב. כדי להקטין עליות",
+      "ג. כדי לשפר אוטומציה",
+      "ד. כדי להעלות את הרווחיות"
+    ],
+    correct: 0
+  },
+  {
+    q: "מה קורה כאשר החברה לא משקיעה ב-R&D לאורך זמן?",
+    answers: [
+      "א. מוצרים נשארים רלוונטיים",
+      "ב. מוצרים מתיישנים ומאבדים ביקוש",
+      "ג. האוטומציה עולה אוטומטית",
+      "ד. שולי התרומה גדלים"
+    ],
+    correct: 1
+  },
+  {
+    q: "באיזה דוח מופיע מספר המניות?",
+    answers: [
+      "א. מאזן",
+      "ב. הצהרת הכנסה",
+      "ג. תזרים מזומנים",
+      "ד. דוח מכירות"
+    ],
+    correct: 0
+  },
+  {
+    q: "מה מתארת ​​רמת מודעות במשחק?",
+    answers: [
+      "א. מודעות למוצר",
+      "ב. יכולת הייצור",
+      "ג. רווח נקי",
+      "ד. רמת האוטומציה"
+    ],
+    correct: 0
+  }
+];
+
+let current = 0;
+let userAnswers = [];
+const container = document.getElementById('quiz-container');
+
+function renderQuestion() {
+  if (current >= questions.length) {
+    let score = userAnswers.filter(ans => ans).length;
+    container.innerHTML = `<div class="done">סיימת! ציון: ${score} מתוך ${questions.length}</div>
+    <button onclick="restartQuiz()">נסה שוב</button>
+    <div style="margin-top:32px;">
+      <span style="font-size:1em;color:#666">שתף עם חברים: העתק את כתובת העמוד מהדפדפן ושלח להם</span>
+    </div>
+    `;
+    return;
+  }
+  const qObj = questions[current];
+  container.innerHTML = `
+    <div style="font-size:1.2em;">
+      <b>שאלה ${current + 1} מתוך ${questions.length}:</b>
+      <div style="margin:12px 0 16px 0;">${qObj.q}</div>
+      <form id="qForm" class="answers">
+        ${qObj.answers.map((ans, i) =>
+          `<label>
+            <input type="radio" name="answer" value="${i}"> ${ans}
+          </label>`
+        ).join('')}
+      </form>
+      <button onclick="checkAnswer()">בדוק</button>
+      <div id="feedback"></div>
+      <div style="margin-top:18px;">
+        <button onclick="nextQuestion()" id="nextBtn" disabled>לשאלה הבאה</button>
+      </div>
+    </div>
+    <div id="score"></div>
+  `;
+}
+
+function checkAnswer() {
+  const form = document.getElementById('qForm');
+  const data = new FormData(form);
+  const chosen = data.get('answer');
+  if (chosen === null) {
+    document.getElementById('feedback').innerText = 'בחר תשובה!';
+    return;
+  }
+  const qObj = questions[current];
+  const feedback = document.getElementById('feedback');
+  if (parseInt(chosen) === qObj.correct) {
+    feedback.innerHTML = '<span style="color:green">נכון!</span>';
+    userAnswers[current] = true;
+  } else {
+    feedback.innerHTML = `<span style="color:red">לא נכון.</span> התשובה הנכונה: ${qObj.answers[qObj.correct]}`;
+    userAnswers[current] = false;
+  }
+  document.getElementById('nextBtn').disabled = false;
+  Array.from(form.elements).forEach(e => e.disabled = true);
+}
+
+function nextQuestion() {
+  current++;
+  renderQuestion();
+}
+
+function restartQuiz() {
+  current = 0;
+  userAnswers = [];
+  renderQuestion();
+}
+
+renderQuestion();
+  <\/script>
+<\/body>
+<\/html>
